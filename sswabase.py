@@ -17,7 +17,6 @@ import math                                    #
 import time                                    #
 import board                                   #
 import lgpio                                   #
-import ssl                                     #
 from adafruit_tmp117 import TMP117             #
 from adafruit_shtc3 import SHTC3               #
 from adafruit_bmp5xx import BMP5XX             #
