@@ -3,7 +3,7 @@
 #######################################
 stationTerrainElevationMeters=536.55  #
 stationPressureHeightMeters=1.55      #
-stationPressureOffsethPa=0            #
+stationPressureOffsethPa=-0.80        #
 vaneOffset=0                          #
 vaneADCMin=0                          #
 vaneADCMax=1650                       #
@@ -13,6 +13,7 @@ vaneADCMax=1650                       #
 # Imports                                      #
 ################################################
 import sys                                     #
+import traceback                               #
 import math                                    #
 import time                                    #
 import board                                   #
@@ -77,6 +78,16 @@ lgpio.gpio_claim_alert(inth,16,lgpio.SET_PULL_UP,lgpio.FALLING_EDGE)  #
 lgpio.gpio_set_debounce_micros(inth,16,800000)                        #
 lgpio.callback(inth,16,lgpio.FALLING_EDGE,rainCallback)               #
 #######################################################################
+
+#### Uptime Calc ####
+boottime=time.time()
+def uptime(timestamp):
+    ups=int(timestamp-boottime)
+    uptm=ups//60
+    upd=ups//86400
+    uph=(ups%86400)//3600
+    upm=(ups%3600)//60
+    return upd,uph,upm,uptm
 
 #### Temperature Fetch ####
 def temperature():
@@ -155,6 +166,7 @@ while True:
     try:
         time.sleep(60-(time.time()%60))
         timestamp=time.time()-0.5
+        updays,uphour,upmins,uptmin=uptime(timestamp)
         temp=temperature()
         humi=humidity()
         statpres,seapres=pressure()
@@ -163,6 +175,5 @@ while True:
         dewp=dewpoint(temp,humi)
     except KeyboardInterrupt:
         exit()
-    except Exception as e:
-        print(e,file=sys.stderr)
-        pass
+    except Exception:
+        traceback.print_exc(file=sys.stderr)
