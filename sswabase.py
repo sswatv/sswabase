@@ -7,7 +7,7 @@ stationPressureOffsethPa=-0.80        #
 vaneOffset=0                          #
 vaneADCMin=0                          #
 vaneADCMax=1650                       #
-#######################################
+#######################################\
 
 ################################################
 # Imports                                      #
@@ -17,7 +17,7 @@ import traceback                               #
 import math                                    #
 import time                                    #
 import board                                   #
-import lgpio                                   #
+import lgpio                                   #\
 from adafruit_tmp117 import TMP117             #
 from adafruit_shtc3 import SHTC3               #
 from adafruit_bmp5xx import BMP5XX             #
@@ -60,6 +60,7 @@ def windCallback(a,b,c,d):
     try:
         winddirs.append([round(time.time()*1000),((((((sensorADC.value>>4)-vaneADCMin)/(vaneADCMax-vaneADCMin))*360)+vaneOffset)%360)])
     except:
+        print(f"================ WDIR FAIL ================",file=sys.stderr)
         pass
 
 #### Rain Callback ####
@@ -77,17 +78,12 @@ lgpio.callback(inth,26,lgpio.FALLING_EDGE,windCallback)               #
 lgpio.gpio_claim_alert(inth,16,lgpio.SET_PULL_UP,lgpio.FALLING_EDGE)  #
 lgpio.gpio_set_debounce_micros(inth,16,800000)                        #
 lgpio.callback(inth,16,lgpio.FALLING_EDGE,rainCallback)               #
-#######################################################################
+#######################################################################\
 
 #### Uptime Calc ####
 boottime=time.time()
 def uptime(timestamp):
-    ups=int(timestamp-boottime)
-    uptm=ups//60
-    upd=ups//86400
-    uph=(ups%86400)//3600
-    upm=(ups%3600)//60
-    return upd,uph,upm,uptm
+    return int(timestamp-boottime)//60
 
 #### Temperature Fetch ####
 def temperature():
@@ -144,9 +140,9 @@ def precip(timestamp):
     cutoff1hr=timestamp-3600000
     rainclicks[:]=[x for x in rainclicks if x >= cutoff24hr]
     localrc=rainclicks[:]
-    rain1=sum(1 for x in localrc if x >= cutoff1hr)*0.254
-    rain24=len(localrc)*0.254
-    rainmn=sum(1 for x in localrc if x >= midnightlocal)*0.254
+    rain1=sum(1 for x in localrc if x >= cutoff1hr)*0.2
+    rain24=len(localrc)*0.2
+    rainmn=sum(1 for x in localrc if x >= midnightlocal)*0.2
     return rain1,rain24,rainmn
 
 #### Dew Point Calculation ####
@@ -166,7 +162,7 @@ while True:
     try:
         time.sleep(60-(time.time()%60))
         timestamp=time.time()-0.5
-        updays,uphour,upmins,uptmin=uptime(timestamp)
+        upmins=uptime(timestamp)
         temp=temperature()
         humi=humidity()
         statpres,seapres=pressure()
@@ -176,4 +172,7 @@ while True:
     except KeyboardInterrupt:
         exit()
     except Exception:
+        print(f"================ {time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(timestamp))} ================",file=sys.stderr)
+        print(f"================ {upmins} ================",file=sys.stderr)
         traceback.print_exc(file=sys.stderr)
+        pass
