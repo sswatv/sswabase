@@ -7,7 +7,7 @@ stationPressureOffsethPa=-0.80        #
 vaneOffset=0                          #
 vaneADCMin=0                          #
 vaneADCMax=1650                       #
-#######################################\
+#######################################
 
 ################################################
 # Imports                                      #
@@ -17,7 +17,7 @@ import traceback                               #
 import math                                    #
 import time                                    #
 import board                                   #
-import lgpio                                   #\
+import lgpio                                   #
 from adafruit_tmp117 import TMP117             #
 from adafruit_shtc3 import SHTC3               #
 from adafruit_bmp5xx import BMP5XX             #
@@ -78,7 +78,7 @@ lgpio.callback(inth,26,lgpio.FALLING_EDGE,windCallback)               #
 lgpio.gpio_claim_alert(inth,16,lgpio.SET_PULL_UP,lgpio.FALLING_EDGE)  #
 lgpio.gpio_set_debounce_micros(inth,16,800000)                        #
 lgpio.callback(inth,16,lgpio.FALLING_EDGE,rainCallback)               #
-#######################################################################\
+#######################################################################
 
 #### Uptime Calc ####
 boottime=time.time()
